@@ -1,0 +1,430 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Condensed:ital,wght@0,500;1,500&display=swap');
+
+:root{
+    --color-barra-lateral:rgb(255,255,255);
+
+    --color-texto:rgb(0,0,0);
+    --color-texto-menu:rgb(134,136,144);
+
+    --color-menu-hover:rgb(238,238,238);
+    --color-menu-hover-texto:rgb(0,0,0);
+
+    --color-boton:rgb(0,0,0);
+    --color-boton-texto:rgb(255,255,255);
+
+    --color-linea:rgb(180,180,180);
+
+    --color-scroll:rgb(192,192,192);
+    --color-scroll-hover:rgb(134,134,134);
+}
+
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Roboto Condensed", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 500;
+    font-style: normal;
+}
+
+body{
+    height: 100vh;
+    width: 100%;
+    background-color: #c2c2c2;
+}
+
+/*-----------------Menu*/
+.menu{
+    position: fixed;
+    width: 50px;
+    height: 50px;
+    font-size: 30px;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50%;
+    cursor: pointer;
+    background-color: var(--color-boton);
+    color: var(--color-boton-texto);
+    right: 15px;
+    top: 15px;
+    z-index: 100;
+}
+/*----------------Barra Lateral*/
+
+.barra-lateral{
+    position: fixed;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 250px;
+    height: 100%;
+    overflow: hidden;
+    padding: 20px 15px;
+    background-color: var(--color-barra-lateral);
+    transition: width 0.5s ease,left 0.5s ease;
+    z-index: 50;
+}
+
+.mini-barra-lateral{
+    width: 80px;
+}
+
+.barra-lateral span{
+    width: 100px;
+    white-space: nowrap;
+    font-size: 18px;
+    text-align: left;
+    opacity: 1;
+    transition: opacity 0.5s ease,width 0.5s ease;
+}
+
+.barra-lateral span.oculto{
+    opacity: 0;
+    width: 0;
+}
+
+/*------------> Nombre de la página */
+.barra-lateral .nombre-pagina{
+    width: 100%;
+    height: 45px;
+    color: var(--color-texto);
+    margin-bottom: 40px;
+    display: flex;
+    align-items: center;
+}
+.barra-lateral .nombre-pagina ion-icon{
+    min-width: 50px;
+    font-size: 40px;
+    cursor: pointer;
+}
+.barra-lateral .nombre-pagina span{
+    margin-left: 5px;
+    font-size: 25px;
+}
+
+/*------------> Botón*/
+.barra-lateral .boton{
+    text-decoration: none;
+    width: 100%;
+    height: 45px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    border-radius: 10px;
+    background-color: var(--color-boton);
+    color: var(--color-boton-texto);
+}
+.barra-lateral .boton ion-icon{
+    min-width: 50px;
+    font-size: 25px;
+}
+
+/*--------------> usario*/
+.barra-lateral .usuario{
+    margin-top: 15px;
+    width: 100%;
+    display: flex;
+    margin-bottom: 15px;
+}
+.barra-lateral .usuario img{
+    width: 50px;
+    min-width: 50px;
+    border-radius: 10px;
+}
+.barra-lateral .usuario .info-usuario{
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    color: var(--color-texto);
+    overflow: hidden;
+}
+.barra-lateral .usuario .nombre-email{
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    margin-left: 5px;
+}
+.barra-lateral .usuario .nombre{ 
+    font-size: 15px;
+    font-weight: 600;
+}
+.barra-lateral .usuario .saludo{
+    font-size: 20px;
+}
+
+/*--------------> Menu Navegación*/
+
+.barra-lateral .navegacion{
+    margin-top: 15px;
+    height: 100%;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.barra-lateral .navegacion::-webkit-scrollbar{
+    width: 5px;
+}
+
+.barra-lateral .navegacion::-webkit-scrollbar-thumb{
+    background-color: var(--color-scroll);
+    border-radius: 5px;
+}
+
+.barra-lateral .navegacion::-webkit-scrollbar-thumb:hover{
+    background-color: var(--color-scroll-hover);
+}
+
+.barra-lateral .navegacion a.activo{
+    background-color: var(--color-menu-hover);
+    color: var(--color-menu-hover-texto);
+}
+
+.barra-lateral .navegacion{
+    height: 100%;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+.barra-lateral .navegacion li{ 
+    list-style: none;
+    display: flex;
+    margin-bottom: 5px;
+}
+.barra-lateral .navegacion a{
+    width: 100%;
+    height: 45px;
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    border-radius: 10px;
+    background-color: var(--color-barra-lateral);
+    color: var(--color-texto-menu);
+}
+.barra-lateral .navegacion a:hover{
+    background-color: var(--color-menu-hover);
+    color: var(--color-menu-hover-texto);
+}
+.barra-lateral .navegacion ion-icon{
+    min-width: 50px;
+    font-size: 20px;
+}
+/*-----------------> Linea*/
+.barra-lateral .linea{
+    width: 100%;
+    height: 1px;
+    margin-top: 15px;
+    background-color: var(--color-linea);
+}
+
+/*-------------main*/
+main{
+    margin-left: 250px;
+    padding: 20px;
+    transition: margin-left 0.5s ease;
+}
+main.min-main{
+    margin-left: 80px;
+}
+
+
+@media (max-height: 660px){
+    .barra-lateral .nombre-pagina{
+        margin-bottom: 5px;
+    }
+}
+
+@media(max-width: 600px){
+    .barra-lateral{
+        position: fixed;
+        left: -250px;
+    }
+
+    .max-barra-lateral{
+        left: 0;
+    }
+
+    .menu{
+        display: flex;
+    }
+
+    .menu ion-icon:nth-child(2){
+        display: none;
+    }
+
+    main{
+        margin-left: 0;
+    }
+    
+    main.min-main{
+        margin-left: 0;
+    }
+}
+
+
+
+/* Estilo principal del contenedor para la cita */
+.contenido-principal {
+    margin-left: 250px; /* Respeta la barra lateral */
+    padding: 40px;
+    min-height: 100vh; /* Para que ocupe toda la altura */
+    display: flex;
+    justify-content: center; /* Centra el contenido horizontalmente */
+    align-items: center; /* Centra el contenido verticalmente */
+}
+
+/* Estilo del contenedor de la cita */
+.cita-contenedor {
+    max-width: 800px;
+    text-align: center;
+    padding: 40px;
+    border-radius: 10px;
+}
+
+/* Estilo de la cita */
+.cita {
+    font-family: 'Georgia', serif; /* Fuente similar a la imagen */
+    font-size: 2rem; /* Tamaño de la fuente */
+    color: #333;
+    font-style: italic;
+    margin-bottom: 20px;
+    position: relative;
+}
+
+/* Añadir las comillas */
+.cita::before {
+    content: '“'; /* Comilla de apertura */
+    font-size: 3rem;
+    color: #999;
+    position: absolute;
+    left: -40px;
+    top: -10px;
+}
+
+.cita::after {
+    content: '”'; /* Comilla de cierre */
+    font-size: 3rem;
+    color: #999;
+    position: absolute;
+    right: -40px;
+    bottom: -10px;
+}
+
+/* Estilo del autor de la cita */
+.autor-cita {
+    font-family: 'Georgia', serif;
+    font-size: 1.5rem;
+    color: #666;
+    font-weight: normal;
+}
+
+.card-body input, select, textarea{
+    margin-bottom: 30px;
+}
+
+/* Alertas */
+
+.alert-success{
+    background: #469b5d;
+    border-left: #3c7f4d;
+}
+
+.alert .fa-check-circle, span.success{
+    color: #32653e;
+}
+
+.alert-warning{
+    background: #81334f;
+    border-left: #6b2c42;
+}
+
+.alert .fa-exclamation-triangle span.warning{
+    color: #552536;
+}
+
+.alert-danger{
+    background: #ffdb9b;
+    border-left: #d1b073;
+}
+
+.alert .fa-exclamation-circle, span.danger{
+    color: #a28c65;
+}
+
+.alert-info{
+    background: #007cb4;
+    border-left: #136693;
+}
+
+.alert .fa-info-circle, span.info{
+    color: #195174;
+} 
+
+.alert i{
+    position: absolute;
+    left: 20px;
+    top: 50%;
+    transform: translateY(-50%);   
+    font-size: 30px;
+}
+
+.alert{
+    padding: 20px 40px;
+    min-width: 420px;
+    position: absolute;
+    right: 0;
+    top: 10px;
+    border-radius: 4px;
+    border-left: 8px solid;
+    overflow: hidden;
+}
+
+.alert .msg{
+    padding: 0 20px;
+    font-size: 18px;
+}
+
+.alert.show{
+    animation: show_slide 1s ease forwards;
+  }
+  @keyframes show_slide {
+    0%{
+      transform: translateX(100%);
+    }
+    40%{
+      transform: translateX(-10%);
+    }
+    80%{
+      transform: translateX(0%);
+    }
+    100%{
+      transform: translateX(-10px);
+    }
+  }
+
+  .alert.hide{
+    animation: hide_slide 1s ease forwards;
+  }
+  @keyframes hide_slide {
+    0%{
+      transform: translateX(-10px);
+    }
+    40%{
+      transform: translateX(0%);
+    }
+    80%{
+      transform: translateX(-10%);
+    }
+    100%{
+      transform: translateX(100%);
+    }
+  }
+
+  /* Archivo CSS */
+.small-icon {
+    width: 40px; /* Cambia este valor para ajustar el tamaño */
+    height: 40px; /* Cambia este valor para mantener las proporciones */
+}

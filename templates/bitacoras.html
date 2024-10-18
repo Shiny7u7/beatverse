@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    {% include 'base.html' %}
+    <title>{% block title %}Bitácora{% endblock %}</title>
+</head>
+
+<body>
+    {% include 'sidebar.html' %}
+
+    <main>
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-12 d-flex justify-content-between align-items-center mb-3">
+                    <h2>Bitácora</h2>
+                    <button class="btn btn-light mb-3" id="btnAddBitacora" type="button" data-bs-toggle="collapse" data-bs-target="#formBitacora" aria-expanded="false" aria-controls="formBitacora">Agregar registro</button>
+                </div>
+
+                <!-- Formulario de bitácora -->
+                <div class="col-md-12 collapse mb-4" id="formBitacora">
+                    <div class="card">
+                        <div class="card-header">
+                            Formulario Bitácora
+                        </div>
+                        <div class="card-body">
+                            <form method="POST">
+                                <div class="row mb-3">
+                                    <div class="col-md-6 col-sm-12">
+                                        <label for="bitacoraDescripcion" class="form-label">Descripción</label>
+                                        <input type="text" id="bitacoraDescripcion" name="bitacoraDescripcion" class="form-control" required>
+                                    </div>
+                                    <div class="col-md-6 col-sm-12">
+                                        <label for="tablaId" class="form-label">Tabla</label>
+                                        <select id="tablaId" name="tablaId" class="form-control" required>
+                                            <option value="" disabled selected>Seleccione una tabla</option>
+                                            {% for tabla in tablas %}
+                                                <option value="{{ tabla.tabla_id }}">{{ tabla.tabla_descripcion }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="d-flex justify-content-end">
+                                    <div class="btn-group" role="group" aria-label="Basic mixed styles example">
+                                        <button type="submit" name="guardar" class="btn btn-success">Guardar</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Lista de bitácora -->
+                <div class="col-md-12 mb-4">
+                    <div class="card">
+                        <div class="card-header">
+                            Lista de Bitácora
+                        </div>
+                        <div class="card-body">
+                            <table class="table table-hover table-borderless">
+                                <thead>
+                                    <tr>
+                                        <th scope="col" class="text-center"><b>ID</b></th>
+                                        <th scope="col" class="text-center"><b>Descripción</b></th>
+                                        <th scope="col" class="text-center"><b>Tabla</b></th>
+                                        <th scope="col" class="text-center"><b>Acciones</b></th>
+                                    </tr>
+                                </thead>
+                                <tbody id="bitacora-tbody">
+                                    {% for bitacora in bitacoras %}
+                                    <tr>
+                                        <td class="text-center">{{ bitacora.bitacora_id }}</td>
+                                        <td class="text-center">{{ bitacora.bitacora_descripcion }}</td>
+                                        <td class="text-center">{{ bitacora.tabla_descripcion }}</td>
+                                        <td class="text-center">
+                                            <button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editModal"
+                                                    data-id="{{ bitacora.bitacora_id }}" data-descripcion="{{ bitacora.bitacora_descripcion }}"
+                                                    data-tablaid="{{ bitacora.tabla_id }}">
+                                                <ion-icon name="create"></ion-icon> Modificar
+                                            </button>
+                                            <button class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#eliminarModal"
+                                                    data-id="{{ bitacora.bitacora_id }}" data-descripcion="{{ bitacora.bitacora_descripcion }}">
+                                                <ion-icon name="trash"></ion-icon> Eliminar
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal de Edición -->
+    <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editModalLabel">Editar registro de Bitácora</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editForm">
+                        <input type="hidden" id="editId" name="bitacora_id" value="">
+                        <div class="mb-3">
+                            <label for="editBitacoraDescripcion" class="form-label">Descripción</label>
+                            <input type="text" id="editBitacoraDescripcion" class="form-control" name="bitacora_descripcion" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editTablaId" class="form-label">ID de Tabla</label>
+                            <input type="number" id="editTablaId" class="form-control" name="tabla_id" required>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                    <button type="button" class="btn btn-primary" id="btnSaveEdit">Guardar Cambios</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal eliminar -->
+    <div class="modal fade" id="eliminarModal" tabindex="-1" aria-labelledby="eliminarModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="eliminarModalLabel">Eliminar registro de Bitácora</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>¿Estás seguro de que deseas eliminar el registro de la bitácora <strong id="descripcionEliminar"></strong>?</p>
+                    <form method="POST">
+                        <input type="hidden" id="bitacoraEliminarId" name="bitacora_id" value="">
+                        <div class="d-flex justify-content-end">
+                            <button type="submit" name="eliminar" class="btn btn-danger">Eliminar</button>
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+
+    <script>
+        // Capturar el evento cuando se abre el modal de edición
+        var editModal = document.getElementById('editModal');
+        editModal.addEventListener('show.bs.modal', function (event) {
+            var button = event.relatedTarget; // Botón que abrió el modal
+
+            // Extraer la información de los atributos data-* del botón
+            var id = button.getAttribute('data-id');
+            var descripcion = button.getAttribute('data-descripcion');
+            var tablaId = button.getAttribute('data-tablaid');
+
+            // Rellenar el formulario dentro del modal con los datos correspondientes
+            editModal.querySelector('#editId').value = id;
+            editModal.querySelector('#editBitacoraDescripcion').value = descripcion;
+            editModal.querySelector('#editTablaId').value = tablaId;
+        });
+
+        // Capturar el evento cuando se abre el modal de eliminar
+        var eliminarModal = document.getElementById('eliminarModal');
+        eliminarModal.addEventListener('show.bs.modal', function (event) {
+            var button = event.relatedTarget; // Botón que abrió el modal
+
+            // Extraer la información de los atributos data-* del botón
+            var id = button.getAttribute('data-id');
+            var descripcion = button.getAttribute('data-descripcion');
+
+            // Rellenar el formulario dentro del modal con los datos correspondientes
+            eliminarModal.querySelector('#bitacoraEliminarId').value = id;
+            eliminarModal.querySelector('#descripcionEliminar').textContent = descripcion;
+        });
+    </script>
+</body>
+
+</html>

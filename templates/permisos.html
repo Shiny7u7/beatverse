@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    {% include 'base.html' %}
+    <title>{% block title %}Permisos{% endblock %}</title>
+</head>
+
+<body>
+    <!-- Incluir la barra lateral -->
+    {% include 'sidebar.html' %}
+
+    <main>
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-12 d-flex justify-content-between align-items-center mb-3">
+                    <h2>Permisos</h2>
+                    <button class="btn btn-light mb-3" id="btnAddPermiso" type="button" data-bs-toggle="collapse" data-bs-target="#formPermisos" aria-expanded="false" aria-controls="formPermisos">Agregar Permiso</button>
+                </div>
+
+                <!-- Formulario de permisos -->
+                <div class="col-md-12 collapse mb-4" id="formPermisos">
+                    <div class="card">
+                        <div class="card-header">
+                            Formulario Permisos
+                        </div>
+                        <div class="card-body">
+                            <form method="POST">
+                                <div class="row mb-3">
+                                    <div class="col-md-12 col-sm-12">
+                                        <label for="permisoDescripcion" class="form-label">Descripción del Permiso</label>
+                                        <input type="text" id="permisoDescripcion" name="permisoDescripcion" class="form-control" required>
+                                    </div>
+                                </div>
+                                <div class="d-flex justify-content-end">
+                                    <div class="btn-group" role="group" aria-label="Basic mixed styles example">
+                                        <button type="submit" name="guardar" class="btn btn-success">Guardar</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Lista de permisos -->
+                <div class="col-md-12 mb-4">
+                    <div class="card">
+                        <div class="card-header">
+                            Lista de Permisos
+                        </div>
+                        <div class="card-body">
+                            <table class="table table-hover table-borderless">
+                                <thead>
+                                    <tr>
+                                        <th scope="col" class="text-center"><b>#</b></th>
+                                        <th scope="col" class="text-center"><b>Descripción</b></th>
+                                        <th scope="col" class="text-center"><b>Acciones</b></th>
+                                    </tr>
+                                </thead>
+                                <tbody id="permisos-tbody">
+                                    {% for permiso in permisos %}
+                                        <tr>
+                                            <td class="text-center">{{ permiso.permiso_id }}</td>
+                                            <td class="text-center">{{ permiso.permiso_descripcion }}</td>
+                                            <td class="text-center">
+                                                <button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editModal"
+                                                        data-id="{{ permiso.permiso_id }}" data-permiso="{{ permiso.permiso_descripcion }}">
+                                                        <ion-icon name="create"></ion-icon> Modificar
+                                                </button>
+                                                <button class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#eliminarModal"
+                                                        data-id="{{ permiso.permiso_id }}" data-permiso="{{ permiso.permiso_descripcion }}">
+                                                        <ion-icon name="trash"></ion-icon> Eliminar
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal de Edición -->
+    <div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editModalLabel">Editar Permiso</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                <div class="modal-body">
+                    <form id="editForm">
+                        <input type="hidden" id="editId" value="">
+                        <div class="form-group">
+                            <label for="editDescripcion">Descripción del Permiso</label>
+                            <input type="text" class="form-control" id="editDescripcion" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal eliminar -->
+    <div class="modal fade" id="eliminarModal" tabindex="-1" aria-labelledby="eliminarModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="eliminarModalLabel">Eliminar Permiso</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    ¿Estás seguro de que deseas eliminar el permiso <strong id="permisoDescripcionEliminar"></strong>?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-danger" id="confirmDelete">Eliminar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            // Evento para abrir el modal de edición
+            $('#editModal').on('show.bs.modal', function(event) {
+                var button = $(event.relatedTarget); // Botón que disparó el modal
+                var permisoId = button.data('id'); // Extraer el ID del permiso
+                var permisoDescripcion = button.data('permiso'); // Extraer la descripción del permiso
+
+                var modal = $(this);
+                modal.find('#editId').val(permisoId);
+                modal.find('#editDescripcion').val(permisoDescripcion);
+            });
+
+            // Evento para abrir el modal de eliminación
+            $('#eliminarModal').on('show.bs.modal', function(event) {
+                var button = $(event.relatedTarget); // Botón que disparó el modal
+                var permisoId = button.data('id'); // Extraer el ID del permiso
+                var permisoDescripcion = button.data('permiso'); // Extraer la descripción del permiso
+
+                var modal = $(this);
+                modal.find('#permisoDescripcionEliminar').text(permisoDescripcion);
+                modal.find('#confirmDelete').data('id', permisoId); // Configura el botón de eliminar con el ID
+            });
+
+            // Confirmar la eliminación del permiso
+            $('#confirmDelete').on('click', function() {
+                var permisoId = $(this).data('id');
+                // Aquí se hace la lógica para eliminar el permiso con AJAX o formulario
+                $.ajax({
+                    url: '/permisos', // Cambia esto a la ruta correcta para eliminar permisos
+                    type: 'POST',
+                    data: { eliminar: permisoId },
+                    success: function(response) {
+                        location.reload(); // Recargar la página para ver los cambios
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+
+</html>

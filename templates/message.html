@@ -1,0 +1,30 @@
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        {% for category, message in messages %}
+            <div id="flash-message" class="alert show alert-{{ category }} alert-dismissible fade shadow-lg rounded" role="alert">
+                <!-- Iconos para diferentes categorías -->
+                {% if category == 'success' %}
+                <i class="fas fa-check-circle"></i>
+                {% elif category == 'warning' %}
+                <i class="fas fa-exclamation-triangle"></i>
+                {% elif category == 'danger' %}
+                <i class="fas fa-exclamation-circle"></i>
+                {% elif category == 'info' %}
+                <i class="fas fa-info-circle"></i>
+                {% else %}
+                <i class="bi bi-bell-fill me-2 text-secondary"></i>
+                {% endif %}
+                <span class="msg {{ category }}"> {{ message }}</span>
+            </div>
+        {% endfor %}
+    {% endif %}
+{% endwith %}
+
+<script>
+    setTimeout(function() {
+            var flashMessage = document.getElementById('flash-message');
+            if (flashMessage) {
+            flashMessage.classList.add('hide');  // Agrega la clase 'hide' después de 3 segundos
+            }
+        }, 5000);  // 3000 ms = 3 segundos
+</script>

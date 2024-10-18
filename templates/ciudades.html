@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    {% include 'base.html' %}
+    <title>{% block title %}Ciudades{% endblock %}</title>
+</head>
+
+<body>
+    {% include 'sidebar.html' %}
+
+    <main>
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-12 d-flex justify-content-between align-items-center mb-3">
+                    <h2>Ciudades</h2>
+                    <button class="btn btn-light mb-3" id="btnAddCiudad" type="button" data-bs-toggle="collapse" data-bs-target="#formCiudades" aria-expanded="false" aria-controls="formCiudades">Agregar Ciudad</button>
+                </div>
+
+                <!-- Formulario de ciudades -->
+                <div class="col-md-12 collapse mb-4" id="formCiudades">
+                    <div class="card">
+                        <div class="card-header">
+                            Formulario Ciudades
+                        </div>
+                        <div class="card-body">
+                            <form id="ciudadForm" method="POST">
+                                <div class="row mb-3">
+                                    <div class="col-md-6 col-sm-12">
+                                        <label for="ciudad_descripcion" class="form-label">Descripción de la Ciudad</label>
+                                        <input type="text" id="ciudad_descripcion" name="ciudad_descripcion" class="form-control" required>
+                                    </div>
+                                    <div class="col-md-6 col-sm-12">
+                                        <label for="pais_id" class="form-label">País</label>
+                                        <select id="pais_id" name="pais_id" class="form-control" required>
+                                            <option value="" disabled selected>Seleccione un país</option>
+                                            {% for pais in paises %}
+                                                <option value="{{ pais.pais_id }}">{{ pais.pais_descripcion }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="d-flex justify-content-end">
+                                    <div class="btn-group" role="group" aria-label="Basic mixed styles example">
+                                        <button type="submit" name="guardar" class="btn btn-success">Guardar</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Lista de ciudades -->
+                <div class="col-md-12 mb-4">
+                    <div class="card">
+                        <div class="card-header">
+                            Lista de Ciudades
+                        </div>
+                        <div class="card-body">
+                            <table class="table table-hover table-borderless">
+                                <thead>
+                                    <tr>
+                                        <th scope="col" class="text-center"><b>Descripción</b></th>
+                                        <th scope="col" class="text-center"><b>País</b></th>
+                                        <th scope="col" class="text-center"><b>Acciones</b></th>
+                                    </tr>
+                                </thead>
+                                <tbody id="ciudades-tbody">
+                                    {% for ciudad in ciudades %}
+                                        <tr>
+                                            <td class="text-center">{{ ciudad.ciudad_descripcion }}</td>
+                                            <td class="text-center">{{ ciudad.pais_descripcion }}</td>
+                                            <td class="text-center">
+                                                <button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editModal"
+                                                        data-id="{{ ciudad.ciudad_id }}" data-descripcion="{{ ciudad.ciudad_descripcion }}" data-paisid="{{ ciudad.pais_id }}">
+                                                    <ion-icon name="create"></ion-icon> Modificar
+                                                </button>
+                                                <button class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#eliminarModal"
+                                                        data-id="{{ ciudad.ciudad_id }}" data-descripcion="{{ ciudad.ciudad_descripcion }}">
+                                                    <ion-icon name="trash"></ion-icon> Eliminar
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal de Edición -->
+    <div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editModalLabel">Editar Ciudad</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                <div class="modal-body">
+                    <form id="editForm">
+                        <input type="hidden" id="editId" value="">
+                        <div class="form-group">
+                            <label for="editCiudadDescripcion">Descripción</label>
+                            <input type="text" class="form-control" id="editCiudadDescripcion" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="editPaisId">ID del País</label>
+                            <input type="number" class="form-control" id="editPaisId" required>
+                        </div>                        
+                        <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal eliminar -->
+    <div class="modal fade" id="eliminarModal" tabindex="-1" aria-labelledby="eliminarModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="eliminarModalLabel">Eliminar Ciudad</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    ¿Estás seguro de que deseas eliminar la ciudad <strong id="ciudadNombreEliminar"></strong>?
+                </div>
+                <div class="modal-footer">
+                    <form method="POST">
+                        <input type="hidden" id="eliminarCiudadId" name="eliminarCiudadId">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" name="eliminarCiudad" class="btn btn-danger">Eliminar</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+
+    <script>
+        var editModal = document.getElementById('editModal');
+        editModal.addEventListener('show.bs.modal', function (event) {
+            var button = event.relatedTarget;
+            var id = button.getAttribute('data-id');
+            var descripcion = button.getAttribute('data-descripcion');
+            var paisId = button.getAttribute('data-paisid');
+
+            editModal.querySelector('#editId').value = id;
+            editModal.querySelector('#editCiudadDescripcion').value = descripcion;
+            editModal.querySelector('#editPaisId').value = paisId;
+        });
+
+        var eliminarModal = document.getElementById('eliminarModal');
+        eliminarModal.addEventListener('show.bs.modal', function (event) {
+            var button = event.relatedTarget;
+            var id = button.getAttribute('data-id');
+            var descripcion = button.getAttribute('data-descripcion');
+
+            eliminarModal.querySelector('#eliminarCiudadId').value = id;
+            eliminarModal.querySelector('#ciudadNombreEliminar').textContent = descripcion;
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,96 @@
+<!-- sidebar.html -->
+<div class="barra-lateral">
+    <div>
+        <div class="nombre-pagina">
+            <img src="{{ url_for('static', filename='img/icon.png') }}" class="small-icon">
+            <span>BeatVerse</span>
+        </div>
+    </div>
+
+    <nav class="navegacion">
+        <ul class="navbar-nav">
+            <li>
+                <a href="{{ url_for('principal') }}" class="{% if active_page == 'inicio' %}activo{% endif %}">
+                    <ion-icon name="home"></ion-icon>
+                    <span>Inicio</span>
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('roles') }}" class="{% if active_page == 'roles' %}activo{% endif %}">
+                    <ion-icon name="person"></ion-icon>
+                    <span>Roles</span>
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('usuarios') }}" class="{% if active_page == 'usuarios' %}activo{% endif %}">
+                    <ion-icon name="people"></ion-icon>
+                    <span>Usuarios</span>
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('clientes') }}" class="{% if active_page == 'clientes' %}activo{% endif %}">
+                    <ion-icon name="person-add"></ion-icon>
+                    <span>Clientes</span>
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('pedidos') }}" class="{% if active_page == 'pedidos' %}activo{% endif %}">
+                    <ion-icon name="clipboard"></ion-icon>
+                    <span>Pedidos</span>
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('tablas') }}" class="{% if active_page == 'tablas' %}activo{% endif %}">
+                    <ion-icon name="document"></ion-icon>
+                    <span>Tablas</span>
+                </a>    
+            </li>
+            <li>
+                <a href="{{ url_for('permisos') }}" class="{% if active_page == 'permisos' %}activo{% endif %}">
+                    <ion-icon name="shield"></ion-icon>
+                    <span>Permisos</span>
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('pais') }}" class="{% if active_page == 'pais' %}activo{% endif %}">
+                    <ion-icon name="globe"></ion-icon>
+                    <span>Países</span>
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('ciudad') }}" class="{% if active_page == 'ciudad' %}activo{% endif %}">
+                    <ion-icon name="pin"></ion-icon>
+                    <span>Ciudades</span>
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('estado') }}" class="{% if active_page == 'estado' %}activo{% endif %}">
+                    <ion-icon name="pin"></ion-icon>
+                    <span>Estados</span>
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('bitacora') }}" class="{% if active_page == 'bitacora' %}activo{% endif %}">
+                    <ion-icon name="book"></ion-icon>
+                    <span>Bitácora</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+
+    <div class="linea"></div>
+
+    <div>
+        <div class="usuario">
+            <div class="info-usuario">
+                <div class="nombre-email">
+                    <span class="nombre"><b>{{ current_user.nombre }}</b></span>
+                </div>
+            </div>
+        </div>
+        <a href="{{ url_for('logout') }}" class="boton">
+            <ion-icon name="exit"></ion-icon>
+            <span>Cerrar Sesión</span>
+        </a>
+    </div>
+</div>

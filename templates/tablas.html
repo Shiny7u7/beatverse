@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    {% include 'base.html' %}
+    <title>Tablas</title>
+</head>
+
+<body>
+    <!-- Incluir la barra lateral -->
+    {% include 'sidebar.html' %}
+
+    <main>
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-12 d-flex justify-content-between align-items-center mb-3">
+                    <h2>Tablas</h2>
+                    <button class="btn btn-light mb-3" id="btnAddTabla" type="button" data-bs-toggle="collapse" data-bs-target="#formTablas" aria-expanded="false" aria-controls="formTablas">Agregar Tabla</button>
+                </div>
+
+                <!-- Formulario de tablas -->
+                <div class="col-md-12 collapse mb-4" id="formTablas">
+                    <div class="card">
+                        <div class="card-header">
+                            Formulario Tablas
+                        </div>
+                        <div class="card-body">
+                            <form method="POST">
+                                <div class="row mb-3">
+                                    <div class="col-md-12 col-sm-12">
+                                        <label for="tabla_descripcion" class="form-label">Descripción</label>
+                                        <input type="text" id="tabla_descripcion" name="tabla_descripcion" class="form-control" required>
+                                    </div>
+                                </div>
+                                <div class="d-flex justify-content-end">
+                                    <div class="btn-group" role="group" aria-label="Basic mixed styles example">
+                                        <button type="submit" name="guardar" class="btn btn-success">Guardar</button>
+                                    </div>
+                                </div>
+                            </form>
+                            
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Lista de tablas -->
+                <div class="col-md-12 mb-4">
+                    <div class="card">
+                        <div class="card-header">
+                            Lista de Tablas
+                        </div>
+                        <div class="card-body">
+                            <table class="table table-hover table-borderless">
+                                <thead>
+                                    <tr>
+                                        <th scope="col" class="text-center"><b>#</b></th>
+                                        <th scope="col" class="text-center"><b>Descripción</b></th>
+                                        <th scope="col" class="text-center"><b>Acciones</b></th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tablas-tbody">
+                                    {% for tabla in tablas %}
+                                        <tr>
+                                            <td class="text-center">{{ tabla.tabla_id }}</td>
+                                            <td class="text-center">{{ tabla.tabla_descripcion }}</td>
+                                            <td class="text-center">
+                                                <button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editModal"
+                                                        data-id="{{ tabla.tabla_id }}" data-descripcion="{{ tabla.tabla_descripcion }}">
+                                                    <ion-icon name="create"></ion-icon> Modificar
+                                                </button>
+                                                <button class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#eliminarModal"
+                                                        data-id="{{ tabla.tabla_id }}" data-descripcion="{{ tabla.tabla_descripcion }}">
+                                                    <ion-icon name="trash"></ion-icon> Eliminar
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal de Edición -->
+    <div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editModalLabel">Editar Tabla</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                <div class="modal-body">
+                    <form method="POST">
+                        <div class="row mb-3">
+                            <div class="col-md-12 col-sm-12">
+                                <label for="descripcion" class="form-label">Descripción</label>
+                                <input type="text" id="descripcion" name="tabla_descripcion" class="form-control" required>
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-end">
+                            <div class="btn-group" role="group" aria-label="Basic mixed styles example">
+                                <button type="submit" name="guardar" class="btn btn-success">Guardar</button>
+                            </div>
+                        </div>
+                    </form>
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Modal eliminar -->
+    <div class="modal fade" id="eliminarModal" tabindex="-1" aria-labelledby="eliminarModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="eliminarModalLabel">Eliminar Tabla</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    ¿Estás seguro de que deseas eliminar la tabla <strong id="tablaNombreEliminar"></strong>?
+                </div>
+                <div class="modal-footer">
+                    <form method="POST">
+                        <input type="hidden" id="eliminarId" name="tabla_id">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" name="eliminar" class="btn btn-danger">Eliminar</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
+
+    <script>
+        // Capturar el evento cuando se abre el modal de edición
+        var editModal = document.getElementById('editModal');
+        editModal.addEventListener('show.bs.modal', function (event) {
+            // Botón que disparó el modal
+            var button = event.relatedTarget;
+            
+            // Extraer la información de los atributos data-* del botón
+            var id = button.getAttribute('data-id');
+            var descripcion = button.getAttribute('data-descripcion');
+
+            // Rellenar el formulario dentro del modal con los datos correspondientes
+            document.getElementById('editId').value = id;
+            document.getElementById('editDescripcion').value = descripcion;
+        });
+
+
+        // Capturar el evento cuando se abre el modal de eliminar
+        var eliminarModal = document.getElementById('eliminarModal');
+        eliminarModal.addEventListener('show.bs.modal', function (event) {
+            // Botón que disparó el modal
+            var button = event.relatedTarget;
+            
+            // Extraer la información de los atributos data-* del botón
+            var id = button.getAttribute('data-id');
+            var descripcion = button.getAttribute('data-descripcion');
+
+            // Rellenar el formulario dentro del modal con los datos correspondientes
+            document.getElementById('eliminarId').value = id;
+            document.getElementById('tablaNombreEliminar').innerText = descripcion;
+        });
+
+    </script>
+
+</body>
+
+</html>

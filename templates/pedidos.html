@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    {% include 'base.html' %}
+    <title>{% block title %}Gestión de Pedidos{% endblock %}</title>
+</head>
+
+<body>
+    <!-- Incluir la barra lateral -->
+    {% include 'sidebar.html' %}
+
+    <main>
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-12 d-flex justify-content-between align-items-center mb-3">
+                    <h2>Gestión de Pedidos</h2>
+                    <button class="btn btn-light mb-3" id="btnAddPedido" type="button" data-bs-toggle="collapse" data-bs-target="#formPedidos" aria-expanded="false" aria-controls="formPedidos">Agregar Pedido</button>
+                </div>
+
+                <!-- Formulario de pedidos -->
+                <div class="col-md-12 collapse mb-4" id="formPedidos">
+                    <div class="card">
+                        <div class="card-header">
+                            Formulario de Pedidos
+                        </div>
+                        <div class="card-body">
+                            <form method="POST">
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label for="cliente" class="form-label">Cliente</label>
+                                        <input type="text" id="cliente" name="cliente" class="form-control" required>
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label for="total" class="form-label">Total</label>
+                                        <input type="number" id="total" name="total" class="form-control" required min="1">
+                                    </div>
+                                </div>
+                                <div class="d-flex justify-content-end">
+                                    <button type="submit" name="guardar" class="btn btn-success">Guardar</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Lista de pedidos -->
+                <div class="col-md-12 mb-4">
+                    <div class="card">
+                        <div class="card-header">
+                            Lista de Pedidos
+                        </div>
+                        <div class="card-body">
+                            <table class="table table-hover table-borderless">
+                                <thead>
+                                    <tr>
+                                        <th scope="col" class="text-center"><b>ID Pedido</b></th>
+                                        <th scope="col" class="text-center"><b>Cliente</b></th>
+                                        <th scope="col" class="text-center"><b>Fecha</b></th>
+                                        <th scope="col" class="text-center"><b>Total</b></th>
+                                        <th scope="col" class="text-center"><b>Acciones</b></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for pedido in pedidos %}
+                                        <tr>
+                                            <td class="text-center">{{ pedido.pedido_id }}</td>
+                                            <td class="text-center">{{ pedido.cliente_nombre }}</td>
+                                            <td class="text-center">{{ pedido.pedido_fecha }}</td>
+                                            <td class="text-center">{{ pedido.pedido_total }}</td>
+                                            <td class="text-center">
+                                                <button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editModal"
+                                                        data-id="{{ pedido.pedido_id }}" data-cliente="{{ pedido.cliente_nombre }}" data-total="{{ pedido.pedido_total }}">
+                                                    <ion-icon name="create"></ion-icon> Modificar
+                                                </button>
+                                                <button class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#eliminarModal"
+                                                        data-id="{{ pedido.pedido_id }}" data-cliente="{{ pedido.cliente_nombre }}">
+                                                    <ion-icon name="trash"></ion-icon> Eliminar
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal editar -->
+    <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editModalLabel">Modificar Pedido</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form method="POST">
+                        <input type="hidden" id="id" name="id">
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="clienteEdit" class="form-label">Cliente</label>
+                                <input type="text" id="clienteEdit" name="clienteEdit" class="form-control" required>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="totalEdit" class="form-label">Total</label>
+                                <input type="number" id="totalEdit" name="totalEdit" class="form-control" required min="1">
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-end">
+                            <button type="submit" name="modificar" class="btn btn-warning">Modificar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal eliminar -->
+    <div class="modal fade" id="eliminarModal" tabindex="-1" aria-labelledby="eliminarModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="eliminarModalLabel">Eliminar Pedido</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>¿Estás seguro de que deseas eliminar el pedido de <strong id="nombreClienteEliminar"></strong>?</p>
+                    <form method="POST">
+                        <input type="hidden" id="idEliminar" name="idEliminar">
+                        <div class="d-flex justify-content-end">
+                            <button type="submit" name="eliminar" class="btn btn-danger">Eliminar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Manejar el evento de clic en el botón de modificar
+        var editModal = document.getElementById('editModal');
+        editModal.addEventListener('show.bs.modal', function (event) {
+            var button = event.relatedTarget;
+
+            // Extraer los datos de los atributos `data-*`
+            var id = button.getAttribute('data-id');
+            var cliente = button.getAttribute('data-cliente');
+            var total = button.getAttribute('data-total');
+
+            // Actualizar los campos del modal de edición
+            editModal.querySelector('#id').value = id;
+            editModal.querySelector('#clienteEdit').value = cliente;
+            editModal.querySelector('#totalEdit').value = total;
+        });
+
+        // Manejar el evento de clic en el botón de eliminar
+        var eliminarModal = document.getElementById('eliminarModal');
+        eliminarModal.addEventListener('show.bs.modal', function (event) {
+            var button = event.relatedTarget;
+            var id = button.getAttribute('data-id');
+            var cliente = button.getAttribute('data-cliente');
+
+            // Actualizar los campos del modal
+            var idInput = eliminarModal.querySelector('#idEliminar');
+            var nombreCliente = eliminarModal.querySelector('#nombreClienteEliminar');
+
+            idInput.value = id;
+            nombreCliente.textContent = cliente;
+        });
+    </script>
+</body>
+
+</html>

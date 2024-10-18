@@ -1,0 +1,275 @@
+<!doctype html>
+<html lang="es">
+
+<head>
+    {% include 'base.html' %}
+    <title>{% block title %}Usuarios{% endblock %}</title>
+</head>
+
+<body>
+    <!-- Incluir la barra lateral -->
+    {% include 'sidebar.html' %}
+
+    <main>
+        <!-- Contenedor principal -->
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-12 d-flex justify-content-between align-items-center mb-3">
+                    <h2>Lista de Usuarios</h2>
+                    <button class="btn btn-light mb-3" id="btnAddUsuario">Agregar Usuario</button>
+                </div>
+
+                <!-- Formulario de Usuarios -->
+                <section class="p-3">
+                    <div class="container">
+                        <div id="formContainer" class="d-none mb-4">
+                            <div class="card">
+                                <div class="card-header">
+                                    Formulario Usuarios
+                                </div>
+                                <div class="card-body">
+                                    <form id="usuarioForm" method="POST">
+                                        <input type="hidden" id="usuarioId" name="usuario_id" value="">
+                                        <div class="row mb-3">
+                                            <div class="col-md-6 col-sm-12">
+                                                <label for="usuario_nombre" class="form-label">Nombre</label>
+                                                <input type="text" id="usuario_nombre" name="usuario_nombre" class="form-control" required>
+                                            </div>
+                                            <div class="col-md-6 col-sm-12">
+                                                <label for="usuario_primerapellido" class="form-label">Primer Apellido</label>
+                                                <input type="text" id="usuario_primerapellido" name="usuario_primerapellido" class="form-control" required>
+                                            </div>
+                                        </div>
+                                        <div class="row mb-3">
+                                            <div class="col-md-6 col-sm-12">
+                                                <label for="usuario_segundoapellido" class="form-label">Segundo Apellido</label>
+                                                <input type="text" id="usuario_segundoapellido" name="usuario_segundoapellido" class="form-control" required>
+                                            </div>
+                                            <div class="col-md-6 col-sm-12">
+                                                <label for="usuario_email" class="form-label">Correo Electrónico</label>
+                                                <input type="email" id="usuario_email" name="usuario_email" class="form-control" required>
+                                            </div>
+                                        </div>
+                                        <div class="row mb-3">
+                                            <div class="col-md-6 col-sm-12">
+                                                <label for="usuario_contrasena" class="form-label">Contraseña</label>
+                                                <input type="password" id="usuario_contrasena" name="usuario_contrasena" class="form-control" required>
+                                            </div>
+                                            <div class="col-md-6 col-sm-12">
+                                                <label for="rol" class="form-label">Rol</label>
+                                                <input type="number" id="rol" name="rol_id" class="form-control" required>
+                                            </div>
+                                        </div>
+                                        <div class="row mb-3">
+                                            <div class="col-md-6 col-sm-12">
+                                                <label for="estado" class="form-label">Estado</label>
+                                                <input type="number" id="estado" name="estado_id" class="form-control" required>
+                                            </div>
+                                        </div>
+                                        <div class="d-flex justify-content-end">
+                                            <button type="submit" class="btn btn-success">Guardar</button>
+                                            <button type="button" class="btn btn-secondary ml-2" id="btnCancel">Cancelar</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Lista de Usuarios -->
+                <div class="col-md-12 mb-4">
+                    <div class="card">
+                        <div class="card-header">
+                            Lista de Usuarios
+                        </div>
+                        <div class="card-body">
+                            <table class="table table-hover table-borderless">
+                                <thead>
+                                    <tr>
+                                        <th class="text-center">Nombre</th>
+                                        <th class="text-center">Primer Apellido</th>
+                                        <th class="text-center">Segundo Apellido</th>
+                                        <th class="text-center">Rol</th>
+                                        <th class="text-center">Estado</th>
+                                        <th class="text-center">Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="usuarios-tbody">
+                                    {% for usuario in usuarios %}
+                                    <tr>
+                                        <td class="text-center">{{ usuario.usuario_nombre }}</td>
+                                        <td class="text-center">{{ usuario.usuario_primerapellido }}</td>
+                                        <td class="text-center">{{ usuario.usuario_segundoapellido }}</td>
+                                        <td class="text-center">{{ usuario.rol_descripcion }}</td>
+                                        <td class="text-center">{{ usuario.estado_descripcion }}</td>
+                                        <td class="text-center">
+                                            <button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editModal"
+                                                    data-id="{{ usuario.usuario_id }}" data-nombre="{{ usuario.usuario_nombre }}"
+                                                    data-primerapellido="{{ usuario.usuario_primerapellido }}" data-segundoapellido="{{ usuario.usuario_segundoapellido }}"
+                                                    data-correo="{{ usuario.usuario_email }}" data-contrasena="{{ usuario.usuario_contrasena }}" data-rol="{{ usuario.rol_id }}"
+                                                    data-estado="{{ usuario.estado_id }}">
+                                                <ion-icon name="create"></ion-icon> Modificar
+                                            </button>
+                                            <button class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#eliminarModal"
+                                                    data-id="{{ usuario.usuario_id }}" data-nombre="{{ usuario.usuario_nombre }}">
+                                                <ion-icon name="trash"></ion-icon> Eliminar
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal de Edición -->
+    <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editModalLabel">Editar Usuario</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editForm">
+                        <input type="hidden" id="editId" name="editId" value="">
+                        <div class="mb-3">
+                            <label for="editNombre" class="form-label">Nombre</label>
+                            <input type="text" id="editNombre" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editPrimerApellido" class="form-label">Primer Apellido</label>
+                            <input type="text" id="editPrimerApellido" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editSegundoApellido" class="form-label">Segundo Apellido</label>
+                            <input type="text" id="editSegundoApellido" class="form-control">
+                        </div>
+                        <div class="mb-3">
+                            <label for="editCorreo" class="form-label">Correo Electrónico</label>
+                            <input type="email" id="editCorreo" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editContrasena" class="form-label">Contraseña</label>
+                            <input type="password" id="editContrasena" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editRol" class="form-label">Rol</label>
+                            <input type="number" id="editRol" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editEstado" class="form-label">Estado</label>
+                            <input type="number" id="editEstado" class="form-control" required>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                    <button type="button" class="btn btn-primary" id="btnSaveEdit">Guardar Cambios</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Eliminación -->
+    <div class="modal fade" id="eliminarModal" tabindex="-1" aria-labelledby="eliminarModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="eliminarModalLabel">Eliminar Usuario</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <h5>¿Estás seguro de querer eliminar al usuario?</h5>
+                    <input type="hidden" id="eliminarId" value="">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-danger" id="btnConfirmDelete">Eliminar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+
+    <script>
+        // Mostrar el formulario al presionar el botón "Agregar Usuario"
+        document.getElementById('btnAddUsuario').addEventListener('click', function () {
+            var formContainer = document.getElementById('formContainer');
+            formContainer.classList.remove('d-none');
+            formContainer.classList.add('d-block');
+        });
+
+        document.getElementById('btnSaveEdit').addEventListener('click', function () {
+            var editForm = document.getElementById('editForm');
+            var formData = new FormData(editForm);
+            
+            // Añadir el método 'modificar' para distinguir en el backend
+            formData.append('modificar', true);
+
+            fetch('/usuarios', {
+                method: 'POST',
+                body: formData
+            }).then(response => {
+                if (response.ok) {
+                    return response.text(); // O JSON, según lo que devuelvas
+                }
+                throw new Error('Network response was not ok.');
+            }).then(data => {
+                location.reload(); // Recarga la página para ver los cambios
+            }).catch(error => console.error('Error:', error));
+        });
+
+
+
+        // Ocultar el formulario al presionar el botón "Cancelar"
+        document.getElementById('btnCancel').addEventListener('click', function () {
+            var formContainer = document.getElementById('formContainer');
+            formContainer.classList.remove('d-block');
+            formContainer.classList.add('d-none');
+        });
+
+        var editModal = document.getElementById('editModal');
+        editModal.addEventListener('show.bs.modal', function (event) {
+            var button = event.relatedTarget; // Botón que disparó el modal
+            var id = button.getAttribute('data-id'); // Extrae el ID del usuario
+            var nombre = button.getAttribute('data-nombre'); // Extrae el nombre del usuario
+            var primerApellido = button.getAttribute('data-primerapellido');
+            var segundoApellido = button.getAttribute('data-segundoapellido');
+            var correo = button.getAttribute('data-correo');
+            var contrasena = button.getAttribute('data-contrasena');
+            var rol = button.getAttribute('data-rol');
+            var estado = button.getAttribute('data-estado');
+
+            // Llenar los campos del modal
+            document.getElementById('editId').value = id;
+            document.getElementById('editNombre').value = nombre;
+            document.getElementById('editPrimerApellido').value = primerApellido;
+            document.getElementById('editSegundoApellido').value = segundoApellido;
+            document.getElementById('editCorreo').value = correo;
+            document.getElementById('editContrasena').value = contrasena;
+            document.getElementById('editRol').value = rol;
+            document.getElementById('editEstado').value = estado;
+        });
+
+
+
+
+        // Capturar el evento cuando se abre el modal de eliminación
+        var eliminarModal = document.getElementById('eliminarModal');
+        eliminarModal.addEventListener('show.bs.modal', function (event) {
+            var button = event.relatedTarget;
+            var id = button.getAttribute('data-id');
+            document.getElementById('eliminarId').value = id;
+        });
+    </script>
+
+</body>
+</html>
