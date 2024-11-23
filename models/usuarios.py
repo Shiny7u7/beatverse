@@ -10,10 +10,9 @@ class UsuariosMySQL:
     @staticmethod
     def obtenerUsuarioPorCorreo(correo):
         try:
-            print("Estableciendo conexión a la base de datos...")
             cone = ConexionMySQL.conexion()
-            cursor = cone.cursor(pymysql.cursors.DictCursor)
-            print(f"Obteniendo usuario con correo: {correo}")
+            cursor = cone.cursor(pymysql.cursors.DictCursor)  # Usar DictCursor para obtener resultados como diccionarios
+            print(f"Obteniendo usuario con correo: {correo}")  # Para depuración
             sql = """
                 SELECT usuario_id, usuario_nombre, usuario_primerapellido, usuario_segundoapellido, usuario_email, usuario_contrasena, rol_id 
                 FROM usuario 
@@ -21,7 +20,7 @@ class UsuariosMySQL:
             """
             cursor.execute(sql, (correo,))
             result = cursor.fetchone()
-            print(f"Resultado de la consulta: {result}")  # Para ver qué devuelve la consulta
+            print(f"Resultado de la consulta: {result}")  # Para depuración
 
             if result:
                 return {
@@ -40,11 +39,8 @@ class UsuariosMySQL:
             print(f"Error al obtener el usuario por correo: {error}")
             return None
         finally:
-            if cursor:
-                cursor.close()
-            if cone:
-                cone.close()
-
+            cursor.close()
+            cone.close()
 
 
     @staticmethod
@@ -58,11 +54,11 @@ class UsuariosMySQL:
             cursor = cone.cursor()
 
             sql_query = """
-                SELECT u.usuario_id, u.usuario_nombre, u.usuario_primerapellido, u.usuario_segundoapellido, u.usuario_email, u.usuario_contrasena,r.rol_descripcion,u.usuario_status, u.estado_id, e.estado_descripcion, u.usuario_fechamodificacion  
+                SELECT u.usuario_id, u.usuario_nombre, u.usuario_primerapellido, u.usuario_segundoapellido, u.usuario_email, u.usuario_contrasena,r.rol_descripcion, u.estado_id, e.estado_descripcion 
                 FROM usuario u 
                 JOIN rol r ON u.rol_id = r.rol_id
                 LEFT JOIN estado e ON u.estado_id = e.estado_id
-                WHERE u.usuario_status = 'Ok';  
+                WHERE u.usuario_status = 'Ok';
             """
             print(f"Ejecutando consulta: {sql_query}")
             cursor.execute(sql_query)

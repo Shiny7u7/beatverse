@@ -1,145 +1,138 @@
-from flask import Blueprint, request, jsonify, session
-from flask_cors import CORS
+# routes/usuarios.py
+from flask import Blueprint, request, render_template, flash, redirect, url_for, session, jsonify
 from models.usuarios import UsuariosMySQL
+from models.roles import RolesMySQL
 
-# Crear el Blueprint para usuarios
-api_usuarios = Blueprint('usuarios', __name__, url_prefix='/usuarios')
+api_usuarios = Blueprint('usuarios', __name__, url_prefix='/usuarios')  # Definido el prefijo /usuarios
 
-# Habilitar CORS para este Blueprint
-CORS(api_usuarios, supports_credentials=True)
-
-# Ruta para inicio de sesión
-@api_usuarios.route('/inicio_sesion', methods=['POST'])
+@api_usuarios.route('/inicio_sesion', methods=['GET', 'POST'])
 def login():
-    try:
-        # Obtener datos JSON del frontend
-        data = request.get_json()
-
-        # Extraer correo y contraseña
-        correo = data.get('correo')
-        contrasena = data.get('contrasena')
+    if request.method == 'POST':
+        # Obtener los datos del formulario de inicio de sesión
+        correo = request.form.get('correo')
+        contrasena = request.form.get('contrasena')
 
         # Validar que los campos no estén vacíos
         if not correo or not contrasena:
-            return jsonify({
-                "success": False,
-                "message": "Por favor ingrese el correo y la contraseña."
-            }), 400
+            flash("Por favor ingrese el correo y la contraseña.", "warning")
+            return render_template('inicio_sesion.html')
 
         # Consultar el usuario en la base de datos
         usuario = UsuariosMySQL.obtenerUsuarioPorCorreo(correo)
 
-        # Verificar si el usuario existe y si la contraseña coincide
+        # Verificar si el usuario existe y si la contraseña es correcta
         if usuario and usuario['contrasena'] == contrasena:
-            # Guardar datos en la sesión (opcional)
+            # Iniciar la sesión, guardando el usuario en `session`
             session['usuario_id'] = usuario['id']
             session['usuario_nombre'] = usuario['nombre']
             session['usuario_rol'] = usuario['rol_id']
 
-            # Respuesta exitosa con datos del usuario
-            return jsonify({
-                "success": True,
-                "usuario": {
-                    "id": usuario['id'],
-                    "nombre": usuario['nombre'],
-                    "correo": usuario['correo'],
-                    "rol_id": usuario['rol_id']
-                }
-            }), 200
+            flash(f"Bienvenido {usuario['nombre']}!", "success")
+            return redirect(url_for('usuarios.principal'))  # Redirigir a la página principal
         else:
-            return jsonify({
-                "success": False,
-                "message": "Correo o contraseña incorrectos."
-            }), 401
-    except Exception as e:
-        return jsonify({
-            "success": False,
-            "message": "Error en el servidor.",
-            "error": str(e)
-        }), 500
+            flash("Correo o contraseña incorrectos.", "danger")
+    
+    # Si es un GET (mostrar el formulario de login)
+    return render_template('inicio_sesion.html')
 
+# Ruta para la página principal (requiere estar logueado)
+@api_usuarios.route('/principal')
+def principal():
+    if 'usuario_id' not in session:
+        flash("Debe iniciar sesión para acceder a esta página.", "warning")
+        return redirect(url_for('usuarios.login'))  # Redirigir al login si no está logueado
+    return render_template('principal.html')
 
-# Ruta para cerrar sesión
-@api_usuarios.route('/cerrar_sesion', methods=['POST'])
+@api_usuarios.route('/cerrar_sesion')
 def logout():
-    try:
-        # Limpiar la sesión
-        session.clear()
-        return jsonify({"success": True, "message": "Sesión cerrada correctamente."}), 200
-    except Exception as e:
-        return jsonify({
-            "success": False,
-            "message": "Error al cerrar sesión.",
-            "error": str(e)
-        }), 500
+    # Limpiar la sesión
+    session.clear()
+    flash("Sesión cerrada correctamente.", "info")
+    return redirect(url_for('usuarios.login'))
 
-# Ruta para obtener todos los usuarios (API)
-@api_usuarios.route('/api/usuarios', methods=['GET'])
-def obtener_usuarios():
-    try:
-        usuarios = UsuariosMySQL.mostrarUsuario()
-        usuarios_con_detalles = []
-        
-        # Añadir correo y contrasena a los usuarios obtenidos
-        for usuario in usuarios:
-            usuarios_con_detalles.append({
-                'usuario_id': usuario['usuario_id'],
-                'usuario_nombre': usuario['usuario_nombre'],
-                'usuario_primerapellido': usuario['usuario_primerapellido'],
-                'usuario_segundoapellido': usuario['usuario_segundoapellido'],
-                'correo': usuario['usuario_email'],
-                'contrasena': usuario['usuario_contrasena'],
-                'rol_descripcion': usuario['rol_descripcion']
-            })
-        return jsonify(usuarios_con_detalles), 200
-    except Exception as e:
-        return jsonify({"error": "Error al obtener usuarios.", "details": str(e)}), 500
-
-# Ruta para obtener un usuario específico (API)
-@api_usuarios.route('/api/usuarios/<int:id>', methods=['GET'])
-def api_obtener_usuario(id):
-    try:
-        usuario = UsuariosMySQL.obtenerUsuario(id)
-        if usuario:
-            return jsonify({
-                'usuario_id': usuario['id'],
-                'usuario_nombre': usuario['nombre'],
-                'primerapellido': usuario['primerapellido'],
-                'segundoapellido': usuario['segundoapellido'],
-                'correo': usuario['correo'],
-                'contrasena': usuario['contrasena'],
-                'rol_id': usuario['rol_id']
-            }), 200
-        else:
-            return jsonify({"error": "Usuario no encontrado."}), 404
-    except Exception as e:
-        return jsonify({"error": "Error al obtener el usuario.", "details": str(e)}), 500
-
-# Ruta para modificar un usuario (API)
-@api_usuarios.route('/api/usuarios/<int:id>', methods=['PUT'])
-def api_modificar_usuario(id):
-    try:
-        data = request.json
-        nombre = data.get('nombre')
-        apellido1 = data.get('apellido1')
-        apellido2 = data.get('apellido2')
-        correo = data.get('correo')
-        contra = data.get('contra')
-        rol = data.get('rol')
+@api_usuarios.route('/usuarios', methods=['GET', 'POST'])
+def usuarios():
+    if request.method == 'POST':
+        idi = request.form.get('id')
+        nombre = request.form.get('nombre')
+        apellido1 = request.form.get('apellido1')
+        apellido2 = request.form.get('apellido2')
+        correo = request.form.get('correo')
+        contra = request.form.get('contra')
+        rol = request.form.get('rol')
 
         if nombre and apellido1 and correo and contra:
-            UsuariosMySQL.modificarUsuario(id, nombre, apellido1, apellido2, correo, contra, rol)
-            return jsonify({"message": "Usuario modificado correctamente."}), 200
+            try:
+                UsuariosMySQL.ingresarUsuarios(idi, nombre, apellido1, apellido2, correo, contra, rol)
+                flash("Usuario ingresado correctamente.")
+            except Exception as e:
+                flash(f"Error al ingresar el usuario: {e}")
         else:
-            return jsonify({"error": "Todos los campos son requeridos."}), 400
-    except Exception as e:
-        return jsonify({"error": "Error al modificar el usuario.", "details": str(e)}), 500
+            flash("Todos los campos son requeridos.")
+    
+    usuarios = UsuariosMySQL.mostrarUsuario()
+    return render_template('usuarios.html', usuarios=usuarios)
 
-# Ruta para eliminar un usuario (API)
+@api_usuarios.route('/api/usuarios', methods=['GET'])
+def obtener_usuarios():
+    usuarios = UsuariosMySQL.mostrarUsuario()
+    return jsonify(usuarios)
+
+@api_usuarios.route('/api/usuarios/<int:id>', methods=['GET'])
+def api_obtener_usuario(id):
+    usuario = UsuariosMySQL.obtenerUsuario(id) 
+    if usuario:
+        return jsonify({
+            'usuario_id': usuario['id'],
+            'usuario_nombre': usuario['nombre'],
+            'primerapellido': usuario['primerapellido'],
+            'segundoapellido': usuario['segundoapellido'],
+            'correo': usuario['correo'],
+            'contrasena': usuario['contrasena'],
+            'rol_id': usuario['rol_id']
+        }), 200
+    else:
+        return jsonify({"error": "Usuario no encontrado."}), 404
+
+@api_usuarios.route('/usuarios/<int:id>', methods=['GET','POST'])
+def modificar_usuario(id):
+    nombre = request.form.get('nombre')
+    apellido1 = request.form.get('apellido1')
+    apellido2 = request.form.get('apellido2')
+    correo = request.form.get('correo')
+    contra = request.form.get('contra')
+    rol = request.form.get('rol')
+
+    if nombre and apellido1 and correo and contra:
+        UsuariosMySQL.modificarUsuario(id, nombre, apellido1, apellido2, correo, contra, rol)
+        flash("Usuario modificado correctamente.")
+    else:
+        flash("Todos los campos son requeridos.")
+    return redirect(url_for('usuarios.usuarios'))
+
+@api_usuarios.route('/api/usuarios/<int:id>', methods=['PUT'])
+def api_modificar_usuario(id):
+    data = request.json
+    nombre = data.get('nombre')
+    apellido1 = data.get('apellido1')
+    apellido2 = data.get('apellido2')
+    correo = data.get('correo')
+    contra = data.get('contra')
+    rol = data.get('rol')
+
+    if nombre and apellido1 and correo and contra:
+        UsuariosMySQL.modificarUsuario(id, nombre, apellido1, apellido2, correo, contra, rol)
+        return jsonify({"message": "Usuario modificado correctamente."}), 200
+    else:
+        return jsonify({"error": "Todos los campos son requeridos."}), 400
+
+@api_usuarios.route('/usuarios/<int:id>')
+def eliminar_usuario(id):
+    UsuariosMySQL.eliminarUsuario(id)
+    flash("Usuario eliminado correctamente.")
+    return redirect(url_for('usuarios.usuarios'))
+
 @api_usuarios.route('/api/usuarios/<int:id>', methods=['DELETE'])
 def api_eliminar_usuario(id):
-    try:
-        UsuariosMySQL.eliminarUsuario(id)
-        return jsonify({"message": "Usuario eliminado correctamente."}), 200
-    except Exception as e:
-        return jsonify({"error": "Error al eliminar el usuario.", "details": str(e)}), 500
+    UsuariosMySQL.eliminarUsuario(id)
+    return jsonify({"message": "Usuario eliminado correctamente."}), 200
