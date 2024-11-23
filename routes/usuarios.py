@@ -2,35 +2,48 @@
 from flask import Blueprint, request, render_template, flash, redirect, url_for, session, jsonify
 from models.usuarios import UsuariosMySQL
 from models.roles import RolesMySQL
+from flask_cors import CORS
+
 
 api_usuarios = Blueprint('usuarios', __name__, url_prefix='/usuarios')  # Definido el prefijo /usuarios
 
-@api_usuarios.route('/inicio_sesion', methods=['GET', 'POST'])
+CORS(api_usuarios, supports_credentials=True)
+
+@api_usuarios.route('/inicio_sesion', methods=['POST'])
 def login():
-    if request.method == 'POST':
-        # Obtener los datos del formulario de inicio de sesión
-        correo = request.form.get('correo')
-        contrasena = request.form.get('contrasena')
+    try:
+        # Asegúrate de que se pueden recibir datos JSON
+        data = request.get_json()
+
+        # Extraer correo y contraseña
+        correo = data.get('correo')
+        contrasena = data.get('contrasena')
 
         # Validar que los campos no estén vacíos
         if not correo or not contrasena:
-            flash("Por favor ingrese el correo y la contraseña.", "warning")
-            return render_template('inicio_sesion.html')
+            return jsonify({"success": False, "message": "Por favor ingrese el correo y la contraseña."}), 400
 
         # Consultar el usuario en la base de datos
         usuario = UsuariosMySQL.obtenerUsuarioPorCorreo(correo)
 
         # Verificar si el usuario existe y si la contraseña es correcta
         if usuario and usuario['contrasena'] == contrasena:
-            # Iniciar la sesión, guardando el usuario en `session`
-            session['usuario_id'] = usuario['id']
-            session['usuario_nombre'] = usuario['nombre']
-            session['usuario_rol'] = usuario['rol_id']
-
-            flash(f"Bienvenido {usuario['nombre']}!", "success")
-            return redirect(url_for('usuarios.principal'))  # Redirigir a la página principal
+            # Enviar los datos del usuario en la respuesta
+            return jsonify({
+                "success": True,
+                "usuario": {
+                    "id": usuario['id'],
+                    "nombre": usuario['nombre'],
+                    "correo": usuario['correo'],
+                    "rol_id": usuario['rol_id']
+                }
+            }), 200
         else:
-            flash("Correo o contraseña incorrectos.", "danger")
+            return jsonify({"success": False, "message": "Correo o contraseña incorrectos."}), 401
+    except Exception as e:
+        # Capturar errores inesperados
+        return jsonify({"success": False, "message": "Error en el servidor.", "error": str(e)}), 500
+
     
     # Si es un GET (mostrar el formulario de login)
     return render_template('inicio_sesion.html')
