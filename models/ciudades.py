@@ -1,4 +1,4 @@
-from models.conexion import ConexionMySQL
+from models.db import ConexionMySQL
 from datetime import datetime
 from flask import flash
 import pymysql
@@ -17,10 +17,9 @@ class CiudadMySQL:
                         SELECT 
                             c.ciudad_id, 
                             c.ciudad_descripcion, 
-                            c.pais_id,
-                            p.pais_descripcion
+                            p.pais_descripcion 
                         FROM ciudad c
-                        LEFT JOIN pais p ON c.pais_id = p.pais_id
+                        LEFT JOIN pais p ON p.pais_id = c.pais_id
                         WHERE ciudad_status = 'Ok';
                     """
                     logging.info(f"Ejecutando consulta: {sql_query}")

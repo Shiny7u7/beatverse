@@ -1,4 +1,4 @@
-from models.conexion import ConexionMySQL
+from models.db import ConexionMySQL
 from datetime import datetime
 from flask import flash
 import pymysql
@@ -16,7 +16,8 @@ class TablaMySQL:
                     sql_query = """
                         SELECT 
                             tabla_id, 
-                            tabla_descripcion
+                            tabla_descripcion, 
+                            tabla_status 
                         FROM tabla 
                         WHERE tabla_status = 'Ok';
                     """
@@ -35,14 +36,13 @@ class TablaMySQL:
             return []
 
     @staticmethod
-    def ingresarTabla(tabla_descripcion):
+    def ingresarTabla(descripcion):
         try:
             with ConexionMySQL.conexion() as cone:
                 with cone.cursor() as cursor:
-                    # Obtener el siguiente ID de tabla
+                    # Alternativa para obtener el siguiente ID de tabla
                     cursor.execute("SELECT COALESCE(MAX(tabla_id), 0) + 1 FROM tabla")
-                    tids = cursor.fetchone()[0]
-                    logging.info(f"Siguiente ID para la tabla: {tids}")  # Agregado para depuración
+                    tids = cursor.fetchone()[0]  # Usa COALESCE para manejar el caso donde no hay tablas
 
                     fechmodi = datetime.now()
                     sql = """
@@ -50,18 +50,11 @@ class TablaMySQL:
                         (tabla_id, tabla_descripcion, tabla_status, tabla_fechamodificacion) 
                         VALUES (%s, %s, %s, %s);
                     """
-                    values = (tids, tabla_descripcion, 'Ok', fechmodi)
-                    logging.info(f"Intentando insertar con valores: {values}")
+                    values = (tids, descripcion, 'Ok', fechmodi)
                     cursor.execute(sql, values)
                     cone.commit()
-
-                    # Comprobar si se insertó alguna fila
-                    if cursor.rowcount > 0:
-                        logging.info(f"Tabla agregada correctamente: {tabla_descripcion} con ID {tids}.")
-                        return True
-                    else:
-                        logging.warning(f"No se insertó la tabla: {tabla_descripcion}")
-                        return False
+                    logging.info(f"Tabla agregada: {descripcion}.")
+                    return True
         except pymysql.Error as error:
             logging.error(f"Error al guardar tabla: {error}")
             flash("Error al guardar la tabla.")
@@ -70,9 +63,6 @@ class TablaMySQL:
             logging.error(f"Error inesperado al ingresar tabla: {e}")
             flash("Ocurrió un error inesperado al ingresar la tabla.")
             return False
-
-
-
 
     @staticmethod
     def modificarTabla(id, descripcion):

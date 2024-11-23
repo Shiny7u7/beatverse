@@ -1,4 +1,4 @@
-from models.conexion import ConexionMySQL
+from models.db import ConexionMySQL
 from datetime import datetime
 from flask import flash
 import pymysql
@@ -15,14 +15,12 @@ class BitacoraMySQL:
                 with cone.cursor() as cursor:
                     sql_query = """
                         SELECT 
-                            b.bitacora_id, 
-                            b.bitacora_descripcion,
-                            b.tabla_id, 
-                            t.tabla_descripcion, 
-                            b.bitacora_status, 
-                            b.bitacora_fechamodificacion 
-                        FROM bitacora b
-                        LEFT JOIN tabla t ON  b.tabla_id = t.tabla_id
+                            bitacora_id, 
+                            bitacora_descripcion, 
+                            tabla_id, 
+                            bitacora_status, 
+                            bitacora_fechamodificacion 
+                        FROM bitacora 
                         WHERE bitacora_status = 'Ok';
                     """
                     logging.info(f"Ejecutando consulta: {sql_query}")

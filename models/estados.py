@@ -1,4 +1,4 @@
-from models.conexion import ConexionMySQL
+from models.db import ConexionMySQL
 from datetime import datetime
 from flask import flash
 import pymysql
@@ -16,8 +16,7 @@ class EstadosMySQL:
                     sql_query = """
                         SELECT 
                             e.estado_id, 
-                            e.estado_descripcion,
-                            e.ciudad_id,
+                            e.estado_descripcion, 
                             c.ciudad_descripcion
                         FROM estado e
                         LEFT JOIN ciudad c ON e.ciudad_id = c.ciudad_id

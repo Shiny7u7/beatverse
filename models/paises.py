@@ -1,4 +1,4 @@
-from models.conexion import ConexionMySQL
+from models.db import ConexionMySQL
 from datetime import datetime
 from flask import flash
 import pymysql
@@ -62,9 +62,6 @@ class PaisMySQL:
             logging.error(f"Error inesperado al ingresar país: {e}")
             flash("Ocurrió un error inesperado al ingresar el país.")
             return False
-
-
-
 
     @staticmethod
     def modificarPais(id, descripcion):

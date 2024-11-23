@@ -1,4 +1,4 @@
-from models.conexion import ConexionMySQL
+from models.db import ConexionMySQL
 from datetime import datetime
 from flask import flash
 import pymysql
@@ -20,35 +20,25 @@ class RolesMySQL:
             cone.close()
 
     @staticmethod
-    def ingresarRol(rol_descripcion):
+    def ingresarRol(rol):
         try:
             cone = ConexionMySQL.conexion()
             cursor = cone.cursor()
-            
-            cursor.execute("SELECT COALESCE(MAX(tabla_id), 0) + 1 FROM tabla")
-            tids = cursor.fetchone()[0]  # Usa COALESCE para manejar el caso donde no hay tablas
-
             fechmodi = datetime.now()
             sql = """
                 INSERT INTO rol 
-                (rol_id, rol_descripcion, rol_status, rol_fechamodificacion) 
-                VALUES (%s, %s, %s, %s);
+                (rol_descripcion, rol_status, rol_fechamodificacion) 
+                VALUES (%s, %s, %s);
             """
-            values = (tids, rol_descripcion, 'Ok', fechmodi)
+            values = (rol, 'Ok', fechmodi)
             cursor.execute(sql, values)
             cone.commit()
-            print(f"Rol '{rol_descripcion}' ingresado correctamente con ID {tids}.")
-            return True
+            print(f"Rol '{rol}' ingresado correctamente.")
         except pymysql.Error as error:
             flash(f"Error al guardar el rol: {error}")
-            return False
         finally:
             cursor.close()
             cone.close()
-
-
-
-
 
     @staticmethod
     def modificarRol(id, rol):

@@ -1,5 +1,4 @@
 
-const box = document.getElementById("box");
 const barraLateral = document.querySelector(".barra-lateral");
 const spans = document.querySelectorAll("span")
 const menu = document.querySelector(".menu");
@@ -22,12 +21,4 @@ menu.addEventListener("click",()=>{
             span.classList.add("oculto");
         })
     }
-});
-
-box.addEventListener('click',()=>{
-    barraLateral.classList.toggle("mini-barra-lateral");
-    main.classList.toggle("min-main");
-    spans.forEach((spans)=>{
-        spans.classList.toggle("oculto")
-    });
 });

@@ -1,4 +1,4 @@
-from models.conexion import ConexionMySQL
+from models.db import ConexionMySQL
 from datetime import datetime
 from flask import flash
 import pymysql
@@ -19,8 +19,7 @@ class ClientesMySQL:
                             cliente_nombre, 
                             cliente_primerapellido, 
                             cliente_segundoapellido, 
-                            cliente_email,
-                            cliente_contrasena 
+                            cliente_email 
                         FROM cliente 
                         WHERE cliente_status = 'Ok';
                     """

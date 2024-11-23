@@ -1,4 +1,4 @@
-from models.conexion import ConexionMySQL
+from models.db import ConexionMySQL
 from datetime import datetime
 from flask import flash
 import pymysql
@@ -11,7 +11,7 @@ class PedidosMySQL:
         try:
             cone = ConexionMySQL.conexion()
             cursor = cone.cursor()
-            cursor.execute("SELECT p.pedido_id, p.cliente_id,c.cliente_nombre, p.pedido_fecha, p.pedido_total, p.pedido_status FROM pedido p JOIN cliente c ON p.cliente_id = c.cliente_id WHERE p.pedido_status = 'Ok'")
+            cursor.execute("SELECT pedido_id, cliente_id, pedido_fecha, pedido_total, pedido_status FROM pedido WHERE pedido_status = 'Ok'")
             miResultado = cursor.fetchall()
             return miResultado
         except pymysql.Error as error:
