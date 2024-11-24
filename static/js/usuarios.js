@@ -1,10 +1,9 @@
-//js/usuarios.js
-
-$(document).ready(function () { 
+$(document).ready(function () {
     loadUsuarios();
 
+    // Función para cargar los usuarios
     function loadUsuarios() {
-        $.get('/usuarios/api/usuarios', function (data) {  // Cambio aquí
+        $.get('/usuarios/api/usuarios', function (data) {
             $('#usuarios-tbody').empty();
             data.forEach(function (usuario) {
                 $('#usuarios-tbody').append(`
@@ -24,71 +23,56 @@ $(document).ready(function () {
         });
     }
 
-    $('#btnAddUsuario').on('click', function () {
-        resetForm(); 
-        $('#formContainer').removeClass('d-none'); 
-    });
-
+    // Manejo del formulario de usuarios
     $('#usuarioForm').on('submit', function (e) {
-        e.preventDefault(); 
-        
+        e.preventDefault();
+
         const usuario_id = $('#usuario_id').val();
         const usuarioData = {
-            usuario_nombre: $('#usuario_nombre').val(),
-            usuario_primerapellido: $('#usuario_primerapellido').val(),
-            usuario_segundoapellido: $('#usuario_segundoapellido').val(),
-            rol_id: $('#rolSelect').val()  // Aquí suponiendo que el rol es el ID del rol seleccionado
+            nombre: $('#usuario_nombre').val(),
+            primerapellido: $('#usuario_primerapellido').val(),
+            segundoapellido: $('#usuario_segundoapellido').val(),
+            correo: $('#usuario_email').val(),
+            contra: $('#usuario_contrasena').val(),
+            rol: $('#rolSelect').val()
         };
 
-        if (usuario_id) {
-            $.ajax({
-                url: `/usuarios/api/usuarios/${usuario_id}`,
-                type: 'PUT',
-                contentType: 'application/json',
-                data: JSON.stringify(usuarioData),
-                success: function () {
-                    loadUsuarios();
-                    resetForm();
-                },
-                error: function (xhr) {
-                    console.error('Error al actualizar el usuario:', xhr.responseText);
-                    alert('Error al actualizar el usuario. Ver consola para más detalles.');
-                }
-            });
-        } else {
-            $.ajax({
-                url: `/usuarios/api/usuarios/`,
-                type: 'PUT',
-                contentType: 'application/json',
-                data: JSON.stringify(usuarioData),
-                success: function () {
-                    loadUsuarios();
-                    resetForm();
-                },
-                error: function (xhr) {
-                    console.error('Error al crear el usuario:', xhr.responseText);
-                    alert('Error al crear el usuario. Ver consola para más detalles.');
-                }
-            });
-        }
+        const url = usuario_id ? `/usuarios/api/usuarios/${usuario_id}` : `/usuarios/api/usuarios`;
+        const method = usuario_id ? 'PUT' : 'POST';
+
+        $.ajax({
+            url: url,
+            type: method,
+            contentType: 'application/json',
+            data: JSON.stringify(usuarioData),
+            success: function () {
+                loadUsuarios();
+                resetForm();
+            },
+            error: function (xhr) {
+                console.error('Error:', xhr.responseText);
+                alert('Error al guardar los datos del usuario.');
+            }
+        });
     });
 
+    // Editar usuario
     window.editUsuario = function (id) {
         $.get(`/usuarios/api/usuarios/${id}`, function (data) {
-            // Cambio aquí
             $('#usuario_id').val(data.usuario_id);
             $('#usuario_nombre').val(data.usuario_nombre);
-            $('#usuario_primerapellido').val(data.primerapellido);
-            $('#usuario_segundoapellido').val(data.segundoapellido);
+            $('#usuario_primerapellido').val(data.usuario_primerapellido);
+            $('#usuario_segundoapellido').val(data.usuario_segundoapellido);
             $('#usuario_email').val(data.correo);
             $('#usuario_contrasena').val(data.contrasena);
             $('#rolSelect').val(data.rol_id);
-            $('#formContainer').removeClass('d-none'); 
+            $('#formContainer').removeClass('d-none');
         }).fail(function () {
             alert('Error al cargar los datos del usuario.');
         });
     };
 
+    // Eliminar usuario
     window.deleteUsuario = function (id) {
         if (confirm('¿Estás seguro de que deseas eliminar este usuario?')) {
             $.ajax({
@@ -99,20 +83,24 @@ $(document).ready(function () {
                 },
                 error: function (xhr) {
                     console.error('Error al eliminar el usuario:', xhr.responseText);
-                    alert('Error al eliminar el usuario. Ver consola para más detalles.');
+                    alert('Error al eliminar el usuario.');
                 }
             });
         }
     };
 
+    // Resetear el formulario
     function resetForm() {
         $('#usuario_id').val('');
         $('#usuario_nombre').val('');
         $('#usuario_primerapellido').val('');
         $('#usuario_segundoapellido').val('');
+        $('#usuario_email').val('');
+        $('#usuario_contrasena').val('');
         $('#rolSelect').val('');
-        $('#formContainer').addClass('d-none'); 
+        $('#formContainer').addClass('d-none');
     }
 
+    // Botón de cancelar
     $('#btnCancel').on('click', resetForm);
 });
