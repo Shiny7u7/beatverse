@@ -11,7 +11,7 @@ from routes.tablas import api_tablas
 from routes.permisos import api_permisos
 
 app = Flask(__name__)
-app.secret_key = 'tu_clave_secreta'
+app.secret_key = '0266'
 
 # Registro de blueprints
 app.register_blueprint(api_usuarios, url_prefix='/usuarios')
