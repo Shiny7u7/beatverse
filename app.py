@@ -1,4 +1,5 @@
 from flask import Flask
+from flask_cors import CORS
 from routes.usuarios import api_usuarios
 from routes.roles import api_roles
 from routes.paises import api_paises
@@ -13,6 +14,11 @@ from routes.permisos import api_permisos
 app = Flask(__name__)
 app.secret_key = '0266'
 
+CORS(app, resources={
+    r"/*": {"origins": ["http://localhost:3000", "https://front2-uojm.onrender.com"]}
+})
+
+
 # Registro de blueprints
 app.register_blueprint(api_usuarios, url_prefix='/usuarios')
 app.register_blueprint(api_roles, url_prefix='/roles')
@@ -26,4 +32,4 @@ app.register_blueprint(api_tablas, url_prefix='/tabla')
 app.register_blueprint(api_permisos, url_prefix='/permisos')
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    app.run(host='0.0.0.0', port=5001, debug=True)
