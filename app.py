@@ -32,4 +32,4 @@ app.register_blueprint(api_tablas, url_prefix='/tabla')
 app.register_blueprint(api_permisos, url_prefix='/permisos')
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5001, debug=True)
+    app.run(host='0.0.0.0', port=5001,ssl_context=('cert.pem', 'key.pem'), debug=True)
